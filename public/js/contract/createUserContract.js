@@ -19,8 +19,9 @@ createContractBtn = trainerId => {
         location.reload();
       })
       .catch(function (error) {
+        console.log(error.response.data);
         alert(error.response.data);
-        location.reload();
+        // location.reload();
       });
   };
 };

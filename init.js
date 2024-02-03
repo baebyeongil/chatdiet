@@ -14,11 +14,16 @@ export class Server {
   expressApp = new ExpressApp();
   httpServer;
   io;
+  redisClient;
 
   constructor() {
     // HTTP 서버를 생성하고, expressApp을 사용하여 요청을 처리하도록 설정
     this.httpServer = new Http.Server(this.expressApp.app);
     this.io = socket(this.httpServer);
+    this.redisClient = createClient({
+      url: `redis://${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/0`,
+      legacyMode: true, // 반드시 설정 !!
+    });
   }
 
   // 서버를 실행하는 메서드입니다.
@@ -41,7 +46,6 @@ export class Server {
         socket.trainer = data.trainer;
         socket.roomId = data.roomId;
         socket.join(socket.roomId);
-        console.log('test');
       });
 
       // 전송한 메세지 받기
@@ -61,19 +65,13 @@ export class Server {
   };
 
   connectRedis = () => {
-    //* Redis 연결
-    const redisClient = createClient({
-      url: `redis://${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/0`,
-      legacyMode: true, // 반드시 설정 !!
-    });
-    redisClient.on('connect', () => {
+    this.redisClient.on('connect', () => {
       console.info('Redis connected!');
     });
-    redisClient.on('error', err => {
+    this.redisClient.on('error', err => {
       console.error('Redis Client Error', err);
     });
-    redisClient.connect().then(); // redis v4 연결 (비동기)
-    const redisCli = redisClient.v4; // 기본 redisClient 객체는 콜백기반인데 v4버젼은 프로미스 기반이라 사용
+    this.redisClient.connect().then(); // redis v4 연결 (비동기)
   };
 
   // HTTP 서버를 시작하는 메서드
@@ -93,7 +91,7 @@ export class Server {
 }
 
 // Server 클래스의 인스턴스를 생성
-const server = new Server();
+export const server = new Server();
 
 // 여기서 실행
 server.runSocket();

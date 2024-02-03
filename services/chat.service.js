@@ -1,6 +1,7 @@
 import { ChatRepository } from '../repositories';
 import { ContractRepository } from '../repositories';
 import { UserRepository } from '../repositories';
+import { server } from '../init';
 
 class ChatService {
   _chatRepository = new ChatRepository();
@@ -9,9 +10,10 @@ class ChatService {
 
   postChat = async (data, userId) => {
     try {
-      const user = await this._userRepository.getOneUserInfo(userId);
-
-      data.name = user.userName;
+      server.connectRedis.set('test', 'user1');
+      const rd = server.connectRedis.get('test');
+      // const user = await this._userRepository.getOneUserInfo(userId);
+      data.name = rd;
 
       await this._chatRepository.postChat(data);
 

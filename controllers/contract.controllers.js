@@ -19,7 +19,6 @@ class ContractController {
   deleteContract = async (req, res) => {
     const { contractId } = req.params;
     const userId = res.locals.userId;
-
     const deleteContract = await this.contractService.deleteContract(contractId, userId);
     return res.status(deleteContract.status).json(deleteContract.message);
   };
