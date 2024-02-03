@@ -15,6 +15,7 @@ export class Server {
   httpServer;
   io;
   redisClient;
+  redis;
 
   constructor() {
     // HTTP 서버를 생성하고, expressApp을 사용하여 요청을 처리하도록 설정
@@ -24,6 +25,7 @@ export class Server {
       url: `redis://${process.env.REDIS_USERNAME}:${process.env.REDIS_PASSWORD}@${process.env.REDIS_HOST}:${process.env.REDIS_PORT}/0`,
       legacyMode: true, // 반드시 설정 !!
     });
+    this.redis = this.redisClient.v4;
   }
 
   // 서버를 실행하는 메서드입니다.

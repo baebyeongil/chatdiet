@@ -10,11 +10,11 @@ class ChatService {
 
   postChat = async (data, userId) => {
     try {
-      const redis = server.redisClient.v4;
-      await redis.set('test', 'user1');
-      const rd = await redis.get('test');
+      await server.redis.set('test', 'user1');
+      const rd = await server.redis.get('test');
       // const user = await this._userRepository.getOneUserInfo(userId);
       data.name = rd;
+      // data.name = user.userName;
 
       await this._chatRepository.postChat(data);
 
