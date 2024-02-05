@@ -10,14 +10,16 @@ class ChatService {
 
   postChat = async (data, userId) => {
     try {
-      await server.redis.set('test', 'user1');
-      const rd = await server.redis.get('test');
-      // const user = await this._userRepository.getOneUserInfo(userId);
-      data.name = rd;
-      // data.name = user.userName;
-
-      await this._chatRepository.postChat(data);
-
+      const rd = await JSON.parse(await server.redis.get(String(userId)));
+      if (!rd) {
+        const user = await this._userRepository.getOneUserInfo(userId);
+        await server.redis.set(String(userId), JSON.stringify(user.userName));
+        data.name = user.userName;
+        await this._chatRepository.postChat(data);
+      } else {
+        data.name = rd;
+        await this._chatRepository.postChat(data);
+      }
       return {
         status: 200,
         message: data.name,
